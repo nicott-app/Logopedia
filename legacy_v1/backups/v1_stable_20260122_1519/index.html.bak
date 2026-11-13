@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogoPedia - Gestión Clínica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            DEFAULT: '#6366f1',
+                            dark: '#4f46e5',
+                            light: '#818cf8'
+                        },
+                        surface: {
+                            light: '#ffffff',
+                            dark: '#1e1b29'
+                        },
+                        bg: {
+                            light: '#f3f4f6',
+                            dark: '#131118'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #374151;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Drag & Drop Styles */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .drag-over {
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 2px dashed #6366f1;
+        }
+
+        .view-hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-bg-light dark:bg-bg-dark text-slate-800 dark:text-gray-200 font-sans h-screen overflow-hidden selection:bg-primary/20">
+
+    <div id="app-container" class="flex h-full">
+
+        <!-- Left Sidebar -->
+        <aside id="sidebar"
+            class="w-64 bg-surface-light dark:bg-surface-dark border-r border-gray-200 dark:border-gray-800 flex flex-col transition-all duration-300 z-20 shrink-0">
+            <div
+                class="h-20 w-full flex items-center justify-center border-b border-gray-200 dark:border-gray-800 shrink-0 overflow-hidden bg-white dark:bg-surface-dark">
+                <img id="sidebar-logo" src="assets/logo.png?v=9"
+                    class="w-full h-full object-cover px-8 mix-blend-multiply dark:mix-blend-normal dark:brightness-200"
+                    alt="TimeCare"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjM2NmYxIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0xMiAyNmwtNCA0IDR6Ii8+PHBhdGggZD0iTTEyIDJ2MjBNMiAxMmgyMCIvPjwvc3ZnPg==';">
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 overflow-y-auto py-6 flex flex-col gap-2 px-3">
+                <button data-view="calendar-view"
+                    class="nav-item active flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">calendar_month</span>
+                    <span class="font-medium">Agenda</span>
+                </button>
+
+                <button data-view="patients-view"
+                    class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">group</span>
+                    <span class="font-medium">Pacientes</span>
+                </button>
+
+                <button data-view="rooms-view"
+                    class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">meeting_room</span>
+                    <span class="font-medium">Salas</span>
+                </button>
+
+                <button data-view="services-view"
+                    class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">design_services</span>
+                    <span class="font-medium">Servicios</span>
+                </button>
+
+                <button data-view="professionals-view"
+                    class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">medical_services</span>
+                    <span class="font-medium">Equipo</span>
+                </button>
+
+                <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+
+                <button data-view="settings-view"
+                    class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">settings</span>
+                    <span class="font-medium">Configuración</span>
+                </button>
+
+                <!-- Logout Button -->
+                <button id="btn-logout"
+                    class="nav-item mt-auto flex items-center gap-3 px-3 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all group">
+                    <span
+                        class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">logout</span>
+                    <span class="font-medium">Cerrar Sesión</span>
+                </button>
+            </nav>
+
+            <!-- User Profile -->
+            <div class="p-4 border-t border-gray-200 dark:border-gray-800 shrink-0">
+                <button
+                    class="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <div
+                        class="size-8 rounded-full bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-white font-bold text-xs">
+                        NT
+                    </div>
+                    <div class="text-left overflow-hidden">
+                        <p class="text-xs font-bold text-slate-700 dark:text-white truncate">Nicolas Tercero</p>
+                        <p class="text-[10px] text-slate-400 truncate">Admin</p>
+                    </div>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col relative min-w-0 overflow-hidden">
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="view-section flex-1 flex flex-col h-full bg-slate-50 dark:bg-[#0f0e13]">
+                <header
+                    class="h-16 bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-start gap-4 px-6 z-10 shrink-0">
+
+                    <!-- 1. Filters (Left) -->
+                    <div id="professional-filters" class="flex items-center gap-2">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <div class="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-2"></div>
+
+                    <!-- 2. Date Controls & Actions (Merged Left) -->
+                    <div class="flex items-center gap-3 text-sm">
+                        <span id="header-date-label" class="text-slate-500">Semana:</span>
+                        <span id="current-week-span" class="font-bold min-w-[150px] text-center inline-block">-- -
+                            --</span>
+
+                        <!-- Nav -->
+                        <div class="flex items-center bg-gray-100 dark:bg-gray-800 rounded-full p-0.5 ml-2">
+                            <button id="prev-week-btn"
+                                class="p-1 hover:bg-white dark:hover:bg-gray-700 rounded-full shadow-sm transition-all text-slate-600 dark:text-gray-300">
+                                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                            </button>
+                            <button id="next-week-btn"
+                                class="p-1 hover:bg-white dark:hover:bg-gray-700 rounded-full shadow-sm transition-all text-slate-600 dark:text-gray-300">
+                                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                            </button>
+                        </div>
+
+                        <!-- View Mode -->
+                        <select id="view-mode-select"
+                            class="ml-3 bg-transparent text-xs font-bold text-slate-600 dark:text-gray-300 border-none outline-none cursor-pointer hover:text-primary transition-colors focus:ring-0">
+                            <option value="day">Día</option>
+                            <option value="week" selected>Semana</option>
+                            <option value="month">Mes</option>
+                            <option value="year">Año</option>
+                        </select>
+
+                        <!-- Year Select (Ensure Visible) -->
+                        <select id="year-select"
+                            class="ml-1 bg-transparent text-xs font-bold text-slate-600 dark:text-gray-300 border-none outline-none cursor-pointer hover:text-primary transition-colors focus:ring-0">
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+
+                        <!-- Actions -->
+                        <div class="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-2"></div>
+
+                        <button onclick="window.app.MockDataManager.generateMockData(window.clinicStore)"
+                            class="size-9 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                            title="Generar Datos Simulados">
+                            <span class="material-symbols-outlined text-[20px]">dataset</span>
+                        </button>
+                        <button onclick="window.app.optimizeSchedule()"
+                            class="size-9 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                            title="Optimizar Horario (IA)">
+                            <span class="material-symbols-outlined text-[20px]">auto_fix_high</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="flex-1 overflow-hidden flex flex-col">
+                    <div id="calendar-header-row"
+                        class="flex border-b border-gray-200 dark:border-gray-800 bg-surface-light dark:bg-surface-dark shrink-0">
+                        <div class="w-16 flex-shrink-0 border-r border-gray-200 dark:border-gray-800"></div>
+                        <div class="flex-1 grid grid-cols-5">
+                            <!-- Headers generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto relative hide-scrollbar">
+                        <div id="calendar-content-wrapper" class="flex min-h-[800px] pt-3 bg-white">
+                            <div id="time-axis-column"
+                                class="w-16 flex-shrink-0 flex flex-col bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-gray-800 sticky left-0 z-10 text-xs text-slate-400 font-medium text-right">
+                                <div id="time-axis" class="flex flex-col pt-0"></div>
+                            </div>
+
+                            <div id="calendar-grid" class="flex-1 grid grid-cols-5 relative bg-white dark:bg-[#131118]">
+                                <!-- Content rendered by app.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Module -->
+            <div id="patients-view"
+                class="view-section view-hidden flex-1 flex flex-col h-full bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+                <header
+                    class="h-16 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 z-10">
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined">group</span> Directorio de Pacientes
+                    </h2>
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                            <input type="text" id="patient-search-input" placeholder="Buscar paciente..."
+                                class="pl-9 pr-4 py-1.5 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-xs focus:ring-2 focus:ring-primary/50 outline-none w-56 text-slate-700 dark:text-gray-200">
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="relative">
+                            <select id="filter-service"
+                                class="appearance-none bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-xs py-1.5 pl-3 pr-8 text-slate-700 dark:text-gray-200 outline-none cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all font-medium min-w-[120px]">
+                                <option value="all">Todos los Servicios</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
+                        </div>
+                        <div class="relative">
+                            <select id="filter-status"
+                                class="appearance-none bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-xs py-1.5 pl-3 pr-8 text-slate-700 dark:text-gray-200 outline-none cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all font-medium">
+                                <option value="all">Todos los Estados</option>
+                                <option value="active">Activo</option>
+                                <option value="waiting">En Espera</option>
+                                <option value="archived">Archivado</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[18px]">expand_more</span>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="window.app.patientManager.openImportPatientModal()"
+                                class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-slate-600 dark:text-white px-4 py-2 rounded-lg font-bold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors flex items-center gap-2 text-sm">
+                                <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                                Importar
+                            </button>
+                            <button onclick="window.app.patientManager.openCreatePatientModal()"
+                                class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2 text-sm">
+                                <span class="material-symbols-outlined text-[18px]">add</span> Nuevo Paciente
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="flex-1 overflow-y-auto px-6 pb-6 pt-2">
+                    <div id="patient-list-container"
+                        class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <!-- Table rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rooms Module -->
+            <div id="rooms-view"
+                class="view-section view-hidden flex-1 flex flex-col h-full bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+                <header
+                    class="h-16 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 z-10">
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined">meeting_room</span> Estado de Salas
+                    </h2>
+
+                    <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                        <button onclick="window.app.navigateDate(-7)"
+                            class="p-1 hover:bg-white dark:hover:bg-gray-700 rounded-md shadow-sm transition-all text-slate-500 hover:text-primary">
+                            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                        </button>
+                        <span id="rooms-date-label"
+                            class="text-xs font-bold text-slate-700 dark:text-gray-300 px-2 min-w-[140px] text-center">Semana
+                            Actual</span>
+                        <button onclick="window.app.navigateDate(7)"
+                            class="p-1 hover:bg-white dark:hover:bg-gray-700 rounded-md shadow-sm transition-all text-slate-500 hover:text-primary">
+                            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                        </button>
+                    </div>
+
+                    <button onclick="window.app.roomManager.openCreateRoomModal()"
+                        class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2 text-sm">
+                        <span class="material-symbols-outlined text-[18px]">add</span> Nueva Sala
+                    </button>
+                </header>
+
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div id="rooms-dashboard" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Module -->
+            <div id="services-view"
+                class="view-section view-hidden flex-1 flex flex-col h-full bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+                <header
+                    class="h-16 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 z-10">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">design_services</span>
+                            Catálogo de Servicios
+                        </h2>
+                    </div>
+                    <button onclick="window.app.serviceManager.openServiceModal()"
+                        class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2 text-sm">
+                        <span class="material-symbols-outlined text-[18px]">add</span> Nuevo Servicio
+                    </button>
+                </header>
+
+                <div class="flex-1 overflow-auto p-6">
+                    <div id="services-grid"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 content-start">
+                        <!-- Service Cards Injected Here -->
+                    </div>
+                    <div id="services-empty"
+                        class="hidden flex flex-col items-center justify-center h-64 text-slate-400">
+                        <span
+                            class="material-symbols-outlined text-6xl mb-4 text-slate-300 dark:text-slate-600">playlist_remove</span>
+                        <p class="text-lg">No hay servicios configurados</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professionals Module -->
+            <div id="professionals-view"
+                class="view-section view-hidden flex-1 flex flex-col h-full bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+                <header
+                    class="h-16 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 z-10">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">medical_services</span>
+                            Equipo Profesional
+                        </h2>
+                    </div>
+                    <button onclick="window.app.professionalManager.openAddProfessionalModal()"
+                        class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2 text-sm">
+                        <span class="material-symbols-outlined text-[18px]">person_add</span> Nuevo Profesional
+                    </button>
+                </header>
+
+                <div class="flex-1 overflow-auto p-6">
+                    <div id="professionals-grid"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 content-start">
+                        <!-- Professional Cards Injected Here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Module -->
+            <div id="settings-view"
+                class="view-section view-hidden flex-1 flex flex-col h-full bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+                <header
+                    class="h-16 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 shrink-0 z-10">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">settings</span>
+                            Configuración General
+                        </h2>
+                    </div>
+                </header>
+
+                <div class="flex-1 overflow-auto p-6">
+                    <div
+                        class="max-w-2xl mx-auto bg-white dark:bg-surface-dark p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+                        <form id="settings-form" class="space-y-8">
+                            <!-- Identity -->
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">badge</span> Identidad de la
+                                    Clínica
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre</label>
+                                        <input type="text" id="setting-clinic-name"
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Logotipo</label>
+                                        <div class="flex items-center gap-4">
+                                            <div
+                                                class="size-16 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden">
+                                                <img id="setting-logo-preview" src=""
+                                                    class="w-full h-full object-contain hidden">
+                                                <span id="setting-logo-placeholder"
+                                                    class="material-symbols-outlined text-slate-300">image</span>
+                                            </div>
+                                            <input type="file" id="setting-logo-upload" accept="image/*" class="hidden">
+                                            <button type="button"
+                                                onclick="document.getElementById('setting-logo-upload').click()"
+                                                class="text-xs font-bold text-primary bg-primary/10 px-3 py-2 rounded-lg hover:bg-primary/20 transition-colors">Subir
+                                                Logo</button>
+                                            <button type="button" id="btn-remove-logo"
+                                                class="hidden text-xs font-bold text-red-500 bg-red-50 px-3 py-2 rounded-lg hover:bg-red-100 transition-colors">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100 dark:border-gray-800">
+
+                            <!-- Preferences -->
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">tune</span> Preferencias
+                                </h3>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Vista
+                                        por Defecto</label>
+                                    <select id="setting-default-view"
+                                        class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                        <option value="week">Semana (Recomendado)</option>
+                                        <option value="day">Día</option>
+                                        <option value="month">Mes</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100 dark:border-gray-800">
+
+                            <!-- Clinic Schedule -->
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-slate-800 dark:text-white mb-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">schedule</span> Horario de
+                                    Apertura
+                                </h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Define el rango horario
+                                    global.</p>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Hora
+                                            Inicio</label>
+                                        <input type="time" id="setting-sched-start" required
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Hora
+                                            Fin</label>
+                                        <input type="time" id="setting-sched-end" required
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100 dark:border-gray-800">
+
+                            <!-- Global Lunch Break -->
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-slate-800 dark:text-white mb-1 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">restaurant</span> Descanso
+                                    Comida (Global)
+                                </h3>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Inicio</label>
+                                        <input type="time" id="setting-lunch-start"
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Fin</label>
+                                        <input type="time" id="setting-lunch-end"
+                                            class="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100 dark:border-gray-800">
+
+                            <!-- Holidays -->
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">event_busy</span> Días Festivos
+                                </h3>
+                                <div class="flex gap-2 mb-4">
+                                    <input type="date" id="setting-holiday-date"
+                                        class="flex-1 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none">
+                                    <button type="button" id="btn-add-holiday"
+                                        class="bg-primary/10 text-primary hover:bg-primary/20 px-4 rounded-xl font-bold transition-colors">
+                                        <span class="material-symbols-outlined">add</span>
+                                    </button>
+                                </div>
+                                <div id="settings-holiday-list" class="flex flex-wrap gap-2">
+                                    <!-- Chips injected by JS -->
+                                </div>
+                            </div>
+
+                            <hr class="border-gray-100 dark:border-gray-800">
+
+                            <!-- Data Management -->
+                            <div>
+                                <h3
+                                    class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">database</span> Gestión de
+                                    Datos
+                                </h3>
+                                <div class="flex items-center gap-4">
+                                    <button type="button" id="btn-export-data"
+                                        class="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold px-3 py-2 text-xs rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+                                        <span class="material-symbols-outlined text-lg">download</span> Copia de
+                                        Seguridad
+                                    </button>
+
+                                    <input type="file" id="import-data-file" accept=".json" class="hidden">
+                                    <button type="button" onclick="document.getElementById('import-data-file').click()"
+                                        class="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 text-slate-600 dark:text-gray-300 font-bold px-3 py-2 text-xs rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700">
+                                        <span class="material-symbols-outlined text-lg">upload_file</span> Restaurar
+                                        Datos
+                                    </button>
+
+                                    <button type="button" id="btn-open-import-ics"
+                                        class="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold px-3 py-2 text-xs rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors">
+                                        <span class="material-symbols-outlined text-lg">calendar_add_on</span> Importar
+                                        Calendario (.ics)
+                                    </button>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Guarda tu información regularmente descargando la
+                                    copia de seguridad.</p>
+                            </div>
+
+                            <div class="pt-4 flex justify-end">
+                                <button type="submit"
+                                    class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside id="right-sidebar"
+            class="w-80 h-full flex-shrink-0 bg-white dark:bg-[#1A1821] border-l border-gray-100 dark:border-gray-800 flex flex-col transition-all duration-300 transform translate-x-0 z-30">
+            <!-- Search Header -->
+            <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex-none">
+                <!-- Tabs -->
+                <div class="flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl mb-3">
+                    <button id="sidebar-tab-waiting"
+                        class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 text-primary shadow-sm transition-all text-center">En
+                        Espera</button>
+                    <button id="sidebar-tab-active"
+                        class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all text-center">Activos</button>
+                </div>
+
+                <!-- Search -->
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <span class="material-symbols-outlined text-[18px]">search</span>
+                    </span>
+                    <input id="sidebar-search-input" type="text"
+                        class="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-700 dark:text-gray-200 placeholder-slate-400 font-medium transition-all"
+                        placeholder="Buscar: Nombre, Hora (L17:00) o Servicio">
+                </div>
+                <div class="mt-2 flex justify-between items-center px-1">
+                    <span id="sidebar-results-count"
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">RESULTADOS (0)</span>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div id="sidebar-suggestions-list" class="flex-1 overflow-y-auto min-h-0 p-3 space-y-2">
+                <!-- Items rendered by SidebarManager -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modals -->
+    <!-- Alerts Modal -->
+    <div id="alerts-modal" class="fixed inset-0 z-50 hidden modal-overlay">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-surface-dark rounded-2xl shadow-xl w-[95vw] max-w-2xl max-h-[80vh] flex flex-col border border-gray-200 dark:border-gray-700 overflow-hidden animate-in zoom-in-95 duration-200">
+            <div
+                class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-surface-dark z-10">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-red-500">notifications_active</span> Centro de Alertas
+                </h2>
+                <button onclick="window.app.alertsManager.closeAlertsModal()"
+                    class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-slate-400 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-[#0f0e13]">
+                <div id="alerts-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Modal (Centered Popup) -->
+    <div id="patient-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onclick="document.getElementById('patient-modal').classList.add('hidden')"></div>
+
+        <!-- Centered Panel -->
+        <div
+            class="relative w-full max-w-7xl bg-white dark:bg-surface-dark rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+
+
+            <!-- Header -->
+            <div
+                class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-surface-dark z-10 shrink-0">
+                <h2 id="patient-modal-title" class="text-xl font-bold text-slate-900 dark:text-white">Nuevo
+                    Paciente</h2>
+                <button onclick="document.getElementById('patient-modal').classList.add('hidden')"
+                    class="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Main Content (Form) -->
+            <div class="flex-1 overflow-hidden">
+                <form id="patient-form" class="h-full flex flex-col divide-y divide-gray-100 dark:divide-gray-700">
+                    <!-- Content Columns Wrapper -->
+                    <div
+                        class="flex-1 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-100 dark:divide-gray-700 overflow-hidden">
+
+                        <!-- Left Column: Personal & Contact Info -->
+                        <div class="w-full md:w-1/3 overflow-y-auto p-5 bg-gray-50 dark:bg-[#131118]">
+                            <div class="space-y-6">
+                                <!-- Personal Data -->
+                                <div>
+                                    <h3
+                                        class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base">person</span> Datos
+                                        Personales
+                                    </h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre
+                                                Completo</label>
+                                            <input type="text" name="name" id="patient-name" required
+                                                class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <div class="col-span-1">
+                                                <label
+                                                    class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Edad</label>
+                                                <input type="number" name="age" id="patient-age"
+                                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                            </div>
+                                            <div class="col-span-2">
+                                                <label
+                                                    class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fecha
+                                                    Nac.</label>
+                                                <input type="date" name="birthDate" id="patient-birthdate"
+                                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tutor -->
+                                <div>
+                                    <h3
+                                        class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base">family_restroom</span>
+                                        Tutor Legal
+                                    </h3>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div class="col-span-2">
+                                            <label
+                                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre</label>
+                                            <input type="text" name="tutorName" id="patient-tutor"
+                                                class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                        </div>
+                                        <div class="col-span-1">
+                                            <label
+                                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Relación</label>
+                                            <select name="tutorRole" id="patient-relation"
+                                                class="w-full px-2 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                                <option value="madre">Madre</option>
+                                                <option value="padre">Padre</option>
+                                                <option value="otro">Otro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contact -->
+                                <div>
+                                    <h3
+                                        class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base">contact_phone</span>
+                                        Contacto
+                                    </h3>
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <div class="relative">
+                                            <span
+                                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[16px]">call</span>
+                                            <input type="tel" name="phone" id="patient-phone" placeholder="Teléfono"
+                                                class="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                        </div>
+                                        <div class="relative">
+                                            <span
+                                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[16px]">mail</span>
+                                            <input type="email" name="email" id="patient-email" placeholder="Email"
+                                                class="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all shadow-sm text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Clinical & Availability -->
+                        <div class="w-full md:w-2/3 flex flex-col h-full bg-white dark:bg-surface-dark">
+                            <div class="flex-1 overflow-y-auto p-6">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <!-- Treatment Info -->
+                                    <div class="space-y-6">
+                                        <h3
+                                            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
+                                            <span class="material-symbols-outlined text-base">medical_services</span>
+                                            Tratamiento
+                                        </h3>
+
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="col-span-2">
+                                                <label
+                                                    class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Servicio</label>
+                                                <select name="service" id="patient-service-select"
+                                                    class="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all text-sm">
+                                                    <!-- Injected by JS -->
+                                                </select>
+                                            </div>
+                                            <div class="col-span-2">
+                                                <label
+                                                    class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Plan</label>
+                                                <select name="treatmentPlan" id="patient-plan-select"
+                                                    class="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all text-sm">
+                                                    <option value="1x45">1 sesión/sem (45 min)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-span-2">
+                                                <label
+                                                    class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tipo</label>
+                                                <div class="flex gap-4 text-sm mt-2">
+                                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                                        <input type="radio" name="treatmentType" value="chronic" checked
+                                                            class="w-4 h-4 text-primary focus:ring-primary border-gray-300">
+                                                        <span
+                                                            class="text-slate-700 dark:text-gray-300 group-hover:text-primary transition-colors">Crónico</span>
+                                                    </label>
+                                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                                        <input type="radio" name="treatmentType" value="temporary"
+                                                            class="w-4 h-4 text-primary focus:ring-primary border-gray-300">
+                                                        <span
+                                                            class="text-slate-700 dark:text-gray-300 group-hover:text-primary transition-colors">Temporal</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div id="sessions-input-container" class="hidden col-span-2">
+                                                <label
+                                                    class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Sesiones</label>
+                                                <input type="number" name="totalSessions" id="patient-sessions"
+                                                    value="10"
+                                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm">
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <label
+                                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Notas</label>
+                                            <textarea name="notes" id="patient-notes" rows="3"
+                                                class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-primary outline-none transition-all resize-none text-sm"
+                                                placeholder="Notas iniciales, diagnóstico previo..."></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Availability -->
+                                    <div class="space-y-6">
+                                        <h3
+                                            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
+                                            <span class="material-symbols-outlined text-base">event_available</span>
+                                            Disponibilidad
+                                        </h3>
+
+                                        <div
+                                            class="space-y-3 bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/30">
+                                            <!-- Loop for Days 0-4 (Mon-Fri) -->
+                                            <!-- Monday (0) -->
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <input type="checkbox" name="days" value="0" id="day-0"
+                                                        class="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary">
+                                                    <label for="day-0"
+                                                        class="text-xs font-bold text-slate-700 dark:text-gray-300 w-20">Lunes</label>
+                                                    <div id="slots-container-0" class="flex-1 flex flex-col gap-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Tuesday (1) -->
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <input type="checkbox" name="days" value="1" id="day-1"
+                                                        class="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary">
+                                                    <label for="day-1"
+                                                        class="text-xs font-bold text-slate-700 dark:text-gray-300 w-20">Martes</label>
+                                                    <div id="slots-container-1" class="flex-1 flex flex-col gap-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Wednesday (2) -->
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <input type="checkbox" name="days" value="2" id="day-2"
+                                                        class="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary">
+                                                    <label for="day-2"
+                                                        class="text-xs font-bold text-slate-700 dark:text-gray-300 w-20">Miércoles</label>
+                                                    <div id="slots-container-2" class="flex-1 flex flex-col gap-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Thursday (3) -->
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <input type="checkbox" name="days" value="3" id="day-3"
+                                                        class="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary">
+                                                    <label for="day-3"
+                                                        class="text-xs font-bold text-slate-700 dark:text-gray-300 w-20">Jueves</label>
+                                                    <div id="slots-container-3" class="flex-1 flex flex-col gap-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Friday (4) -->
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <input type="checkbox" name="days" value="4" id="day-4"
+                                                        class="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary">
+                                                    <label for="day-4"
+                                                        class="text-xs font-bold text-slate-700 dark:text-gray-300 w-20">Viernes</label>
+                                                    <div id="slots-container-4" class="flex-1 flex flex-col gap-2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <!-- Footer Actions -->
+                    <div
+                        class="p-6 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-[#131118] flex items-center gap-3 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+
+                        <button type="submit" id="btn-save-patient"
+                            class="flex-1 bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl font-bold text-base shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined" id="btn-save-patient-icon">save</span>
+                            <span id="btn-save-patient-text">Guardar Paciente</span>
+                        </button>
+
+                        <button type="button" id="btn-delete-patient"
+                            class="hidden px-4 py-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 font-bold text-sm transition-colors flex items-center justify-center shadow-sm"
+                            title="Eliminar Paciente">
+                            <span class="material-symbols-outlined text-[24px]">delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+
+
+    <!-- ========================================== -->
+    <!-- MODALS RESTORATION -->
+    <!-- ========================================== -->
+
+    <!-- 1. NEW APPOINTMENT MODAL -->
+    <div id="new-appointment-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all duration-300">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden scale-100 transition-all duration-300 animate-in fade-in zoom-in-95">
+            <!-- Header -->
+            <div
+                class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10">
+                <h3 id="appt-modal-title"
+                    class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">event</span>
+                    Nueva Cita
+                </h3>
+                <button class="close-modal-btn text-slate-400 hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="new-appointment-form" class="p-6 space-y-5">
+                <!-- Patient Search/Select -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5 ml-1">Paciente</label>
+                    <div class="relative">
+                        <select id="new-appt-patient-id" class="hidden"></select>
+                        <!-- Fallback/Search UI -->
+                        <input type="text" id="new-appt-patient-search" placeholder="Buscar paciente..."
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm font-medium text-slate-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+                        <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400">search</span>
+                        <!-- Quick Add Patient Button could go here -->
+                    </div>
+                </div>
+
+                <!-- Professional -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5 ml-1">Profesional</label>
+                    <div class="relative">
+                        <select id="new-appt-prof"
+                            class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm font-medium text-slate-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-primary/50 appearance-none transition-all cursor-pointer">
+                            <!-- Populated by JS -->
+                        </select>
+                        <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400">stethoscope</span>
+                        <span
+                            class="material-symbols-outlined absolute right-3 top-3 text-slate-400 pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- Date & Time -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5 ml-1">Fecha</label>
+                        <div class="relative">
+                            <input type="date" id="new-appt-date"
+                                class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm font-medium text-slate-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-3 text-slate-400">calendar_today</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5 ml-1">Hora</label>
+                        <div class="relative">
+                            <input type="time" id="new-appt-time"
+                                class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm font-medium text-slate-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+                            <span class="material-symbols-outlined absolute left-3 top-3 text-slate-400">schedule</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit"
+                        class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">check</span>
+                        <span id="btn-save-appt-text">Agendar Cita</span>
+                    </button>
+                    <button type="button" id="btn-delete-appt"
+                        class="hidden px-4 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 font-bold text-sm transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 2. OPTIMIZATION MODAL (Smart Scheduler) -->
+    <div id="optimization-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <!-- Header -->
+            <div
+                class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/10 flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-purple-500">auto_fix_high</span>
+                        Asistente de Citas
+                    </h3>
+                    <p id="opt-slot-info" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">--</p>
+                </div>
+                <button
+                    class="close-modal-btn text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Tabs & Search -->
+            <div class="p-4 border-b border-gray-100 dark:border-gray-800 space-y-4 shrink-0">
+                <!-- Search -->
+                <div class="relative">
+                    <input type="text" id="opt-search-input" placeholder="Buscar paciente en lista..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-800 border-none rounded-xl text-sm font-medium text-slate-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-purple-500/50 transition-all">
+                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400">search</span>
+                </div>
+
+                <!-- Tabs -->
+                <div class="p-1 bg-gray-100 dark:bg-gray-800/50 rounded-xl flex gap-1">
+                    <button id="opt-tab-waiting"
+                        class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 text-purple-600 shadow-sm transition-all text-center">
+                        Lista de Espera
+                    </button>
+                    <button id="opt-tab-active"
+                        class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all text-center">
+                        Pacientes Activos
+                    </button>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="opt-suggestions-list">
+                <!-- Items injected by JS -->
+            </div>
+
+            <!-- Empty State (Hidden by default) -->
+            <div id="opt-no-results" class="hidden flex flex-col items-center justify-center py-10 text-center">
+                <span class="material-symbols-outlined text-4xl text-slate-200 mb-2">savings</span>
+                <p class="text-slate-400 text-sm font-medium">No se encontraron sugerencias.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 3. BOOKING OPTIONS MODAL (Flow Step 2) -->
+    <div id="booking-options-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Tipo de Cita</h3>
+                <button class="close-modal-btn text-slate-400 hover:text-slate-600"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div id="booking-options-content" class="space-y-3">
+                <!-- Options injected by JS (Sporadic vs Fixed) -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CANCELLATION CHOICE MODAL -->
+    <div id="cancellation-choice-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-[#1a1821] w-full max-w-md rounded-2xl shadow-2xl p-6 text-center space-y-4">
+            <div
+                class="size-12 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-2xl">warning</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white">¿Cancelar Cita?</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Esta cita es parte de un tratamiento recurrente.</p>
+
+            <div class="grid grid-cols-1 gap-3 mt-4">
+                <button id="btn-cancel-single"
+                    class="w-full py-3 rounded-xl border-2 border-slate-100 dark:border-slate-700 font-bold text-slate-600 dark:text-slate-300 hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-500 transition-all">
+                    Solo esta cita
+                </button>
+                <button id="btn-cancel-recurring"
+                    class="w-full py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold shadow-lg shadow-red-500/20 transition-all">
+                    Finalizar Tratamiento
+                </button>
+            </div>
+            <button id="btn-cancel-choice-close"
+                class="text-xs text-slate-400 hover:text-slate-600 font-bold underline mt-2">No, mantener cita</button>
+        </div>
+    </div>
+
+    <!-- 5. WARNING CONFLICT MODAL -->
+    <div id="warning-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-[#1a1821] w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
+            <div
+                class="size-12 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-500 flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-2xl">priority_high</span>
+            </div>
+            <h3 id="warning-title" class="text-lg font-bold text-slate-800 dark:text-white">Atención</h3>
+            <p id="warning-message" class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">--</p>
+
+            <div class="flex gap-3 mt-4">
+                <button id="warning-cancel-btn"
+                    class="flex-1 py-2 rounded-xl text-slate-500 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancelar</button>
+                <button id="warning-confirm-btn"
+                    class="flex-1 py-2 rounded-xl bg-amber-500 text-white font-bold shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-colors">Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. PATIENT PROFILE MODAL -->
+    <div id="patient-profile-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-200">
+
+            <!-- Left Sidebar (Profile Info) -->
+            <div
+                class="w-full md:w-80 bg-gray-50 dark:bg-gray-800/10 border-r border-gray-100 dark:border-gray-800 flex flex-col shrink-0 overflow-y-auto">
+                <div class="p-6 text-center border-b border-gray-100 dark:border-gray-800">
+                    <div id="profile-avatar"
+                        class="size-20 bg-primary/10 text-primary text-2xl font-bold rounded-full flex items-center justify-center mx-auto mb-4">
+                        --
+                    </div>
+                    <h2 id="profile-name" class="text-xl font-bold text-slate-800 dark:text-white">--</h2>
+                    <p id="profile-age" class="text-sm text-slate-500 dark:text-gray-400 mt-1">-- años</p>
+                </div>
+
+                <div class="p-6 space-y-6 flex-1">
+                    <!-- Contact -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Contacto</h3>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-slate-400 text-lg">call</span>
+                            <div>
+                                <p id="profile-phone" class="text-sm font-bold text-slate-700 dark:text-gray-300">--</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-slate-400 text-lg">mail</span>
+                            <p id="profile-email"
+                                class="text-sm font-medium text-slate-700 dark:text-gray-300 break-all">--</p>
+                        </div>
+                    </div>
+
+                    <!-- Tutor -->
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tutor Legal</h3>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-slate-400 text-lg">family_restroom</span>
+                            <p id="profile-tutor" class="text-sm font-medium text-slate-700 dark:text-gray-300">--</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <div
+                            class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                            <h4 class="text-[10px] text-slate-400 uppercase font-bold mb-1">Citas</h4>
+                            <p id="stat-total-appts" class="text-lg font-bold text-primary">0</p>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-center">
+                            <h4 class="text-[10px] text-slate-400 uppercase font-bold mb-1">Asistencia</h4>
+                            <p id="stat-attendance" class="text-lg font-bold text-green-500">--%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content -->
+            <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#1a1821]">
+                <!-- Header / Tabs -->
+                <div
+                    class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                    <div class="flex gap-6">
+                        <button id="tab-history" onclick="window.app.patientManager.switchProfileTab('history')"
+                            class="profile-tab-btn pb-4 -mb-4 border-b-2 border-primary text-primary font-bold text-sm transition-colors cursor-pointer">
+                            Historial
+                        </button>
+                        <button id="tab-notes" onclick="window.app.patientManager.switchProfileTab('notes')"
+                            class="profile-tab-btn pb-4 -mb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors cursor-pointer">
+                            Notas Clínicas
+                        </button>
+                        <button id="tab-files" onclick="window.app.patientManager.switchProfileTab('files')"
+                            class="profile-tab-btn pb-4 -mb-4 border-b-2 border-transparent text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors cursor-pointer">
+                            Archivos
+                        </button>
+                    </div>
+                    <button onclick="document.getElementById('patient-profile-modal').classList.add('hidden')"
+                        class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Content Body -->
+                <div class="flex-1 overflow-y-auto p-6 bg-gray-50/30 dark:bg-gray-900/10">
+
+                    <!-- Balance Alerts -->
+                    <div id="profile-balance-container" class="hidden mb-6">
+                        <div id="profile-balance-list" class="space-y-2"></div>
+                    </div>
+
+                    <!-- TAB: History -->
+                    <div id="content-history" class="tab-content space-y-4">
+                        <div id="profile-history-list" class="space-y-3"></div>
+                    </div>
+
+                    <!-- TAB: Notes -->
+                    <div id="content-notes" class="tab-content hidden space-y-4">
+                        <!-- Input -->
+                        <div
+                            class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm mb-6">
+                            <textarea id="new-note-input" rows="2" placeholder="Escribir nueva nota..."
+                                class="w-full bg-transparent border-none focus:ring-0 text-sm resize-none placeholder-slate-400 text-slate-700 dark:text-gray-200"></textarea>
+                            <div class="flex justify-end mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                <button onclick="window.app.patientManager.addPatientNote()"
+                                    class="bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm shadow-primary/20">
+                                    Añadir Nota
+                                </button>
+                            </div>
+                        </div>
+                        <div id="profile-notes-list" class="space-y-4"></div>
+                    </div>
+
+                    <!-- TAB: Files -->
+                    <div id="content-files" class="tab-content hidden">
+                        <div id="profile-files-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 7. CREATE ROOM MODAL -->
+    <div id="create-room-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="room-modal-title" class="text-lg font-bold text-slate-800 dark:text-white">Nueva Sala</h3>
+                <button onclick="document.getElementById('create-room-modal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form id="create-room-form" class="space-y-4">
+                <!-- Name -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre de Sala</label>
+                    <input type="text" id="room-name" name="name" required placeholder="Ej: Sala 1, Gimnasio..."
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                </div>
+
+                <!-- Type & Capacity -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo</label>
+                        <select id="room-type" name="type"
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                            <option value="standard">Estándar</option>
+                            <option value="office">Despacho</option>
+                            <option value="gym">Gimnasio</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Capacidad</label>
+                        <input type="number" id="room-capacity" name="capacity" value="1" min="1"
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Resources -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Recursos / Material</label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="room-resources-input" placeholder="Añadir..."
+                            class="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                        <button type="button" id="btn-add-resource"
+                            class="px-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-xl font-bold hover:bg-indigo-100 transition-colors">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                        </button>
+                    </div>
+                    <div id="room-resources-list" class="flex flex-wrap gap-2 min-h-[2rem]">
+                        <!-- Chips injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" id="btn-save-room-modal"
+                        class="flex-1 bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">check</span>
+                        <span>Guardar</span>
+                    </button>
+                    <button type="button" id="btn-delete-room"
+                        class="hidden bg-red-50 text-red-600 hover:bg-red-100 px-3 rounded-xl font-bold transition-colors">
+                        <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 8. ROOM AVAILABILITY MODAL -->
+    <div id="room-availability-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-200">
+            <div
+                class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/20">
+                <h3 id="avail-modal-title" class="text-lg font-bold text-slate-800 dark:text-white">Agenda de Sala</h3>
+                <button onclick="document.getElementById('room-availability-modal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div id="avail-slots-grid" class="flex-1 overflow-y-auto p-4 space-y-2">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 9. SERVICE MODAL -->
+    <div id="service-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="service-modal-title" class="text-lg font-bold text-slate-800 dark:text-white">Nuevo Servicio
+                </h3>
+                <button onclick="document.getElementById('service-modal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form id="service-form" class="space-y-4">
+                <!-- Name -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre</label>
+                    <input type="text" id="service-name-input" required placeholder="Ej: Logopedia..."
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                </div>
+
+                <!-- Specs -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Duración</label>
+                        <div class="flex gap-2 mb-4">
+                            <button type="button" onclick="window.app.serviceManager.setServiceDuration(30)"
+                                class="flex-1 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors">30'</button>
+                            <button type="button" onclick="window.app.serviceManager.setServiceDuration(45)"
+                                class="flex-1 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors">45'</button>
+                            <button type="button" onclick="window.app.serviceManager.setServiceDuration(60)"
+                                class="flex-1 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-xs font-bold text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors">60'</button>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Duración
+                                Personalizada</label>
+                            <input type="number" id="service-duration-input" required value="45"
+                                class="w-full pl-3 pr-8 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                            <span class="absolute right-3 top-7 text-xs text-slate-400 font-bold">min</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Precio (€)</label>
+                        <input type="number" id="service-price-input" required value="45" step="0.5"
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Descripción (Opcional)</label>
+                    <textarea id="service-description-input" rows="2"
+                        class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" id="btn-save-service-confirm"
+                        class="flex-1 bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">check</span>
+                        <span id="btn-save-service-text">Guardar</span>
+                    </button>
+                    <button type="button" id="btn-delete-service"
+                        class="hidden bg-red-50 text-red-600 hover:bg-red-100 px-3 rounded-xl font-bold transition-colors">
+                        <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 10. PROFESSIONAL MODAL -->
+    <div id="add-professional-modal"
+        class="modal-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="bg-white dark:bg-[#1a1821] w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div
+                class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/10">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Nuevo Profesional</h3>
+                <button onclick="document.getElementById('add-professional-modal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6">
+                <form id="add-professional-form" class="space-y-6">
+                    <!-- Identity -->
+                    <div class="flex items-start gap-4">
+                        <div class="shrink-0 space-y-2 text-center">
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Color</label>
+                            <div class="relative group">
+                                <input type="hidden" id="input-prof-color" name="color" value="blue">
+                                <div id="color-picker-grid"
+                                    class="grid grid-cols-3 gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                                    <!-- Colors injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre
+                                    Completo</label>
+                                <input type="text" id="add-prof-name" name="name" required
+                                    placeholder="Ej: Dr. Juan Pérez"
+                                    class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Especialidad
+                                    Principal</label>
+                                <div class="relative">
+                                    <select id="add-prof-service" name="service"
+                                        class="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary outline-none transition-all appearance-none">
+                                        <!-- Injected by JS -->
+                                    </select>
+                                    <span
+                                        class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400">medical_services</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-100 dark:border-gray-800">
+
+                    <!-- Assignments -->
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white mb-3">Asignaciones</h4>
+                        <div class="relative">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Salas Asignadas</label>
+                            <button type="button" id="room-multiselect-trigger"
+                                class="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-left transition-all hover:bg-white dark:hover:bg-gray-700">
+                                <span id="room-multiselect-label"
+                                    class="text-sm font-medium text-slate-600 dark:text-gray-300">Seleccionar
+                                    salas...</span>
+                                <span class="material-symbols-outlined text-slate-400">arrow_drop_down</span>
+                            </button>
+                            <!-- Dropdown injected to body by JS -->
+                            <div id="room-multiselect-dropdown"
+                                class="hidden bg-white dark:bg-gray-800 shadow-xl rounded-xl border border-gray-100 dark:border-gray-700 p-2 max-h-48 overflow-y-auto">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-100 dark:border-gray-800">
+
+                    <!-- Schedule -->
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white mb-3">Horario General</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Jornada</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="time" id="prof-sched-start" name="scheduleStart"
+                                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm">
+                                    <span class="text-slate-400 text-xs">-</span>
+                                    <input type="time" id="prof-sched-end" name="scheduleEnd"
+                                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descanso
+                                    (Comida)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="time" id="prof-lunch-start" name="lunchStart"
+                                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm">
+                                    <span class="text-slate-400 text-xs">-</span>
+                                    <input type="time" id="prof-lunch-end" name="lunchEnd"
+                                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" id="btn-save-prof-modal-v2"
+                            class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">check</span>
+                            <span>Guardar Profesional</span>
+                        </button>
+                        <button type="button" id="btn-delete-prof"
+                            class="hidden px-4 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 font-bold transition-colors">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/modules/App.js"></script>
+</body>
+
+</html>

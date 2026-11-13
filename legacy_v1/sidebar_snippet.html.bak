@@ -1,0 +1,76 @@
+</aside>
+
+<!-- Main Content -->
+<!-- Start Main -->
+<!-- ... existing main content ... -->
+<!-- End Main (Implied at L1402) -->
+
+<!-- Right Sidebar (Restored) -->
+<aside
+    class="w-80 bg-surface-light dark:bg-surface-dark border-l border-gray-200 dark:border-gray-800 flex-shrink-0 flex flex-col z-20 hidden xl:flex transition-all">
+    <!-- Header -->
+    <div class="p-6 pb-2">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">patient_list</span>
+                Pacientes <span id="sidebar-count"
+                    class="bg-gray-100 dark:bg-gray-700 text-slate-600 dark:text-gray-300 px-2 py-0.5 rounded text-xs">0</span>
+            </h2>
+        </div>
+
+        <!-- Search -->
+        <div class="relative mb-3">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <span class="material-symbols-outlined text-[20px]">search</span>
+            </span>
+            <input id="sidebar-search-input" type="text"
+                class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-700 dark:text-gray-200 placeholder-slate-400 font-medium transition-all"
+                placeholder="Buscar paciente...">
+        </div>
+
+        <!-- Service Filter (NEW) -->
+        <div class="mb-4">
+            <select id="sidebar-service-filter"
+                class="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-700 dark:text-gray-200 font-medium cursor-pointer">
+                <option value="all">Todos los Servicios</option>
+                <option value="Logopedia">Logopedia</option>
+                <option value="Psicología">Psicología</option>
+                <option value="Neuropsicología">Neuropsicología</option>
+                <option value="Fisioterapia">Fisioterapia</option>
+            </select>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex p-1 bg-gray-100 dark:bg-gray-800/80 rounded-xl mb-0">
+            <button id="sidebar-tab-waiting"
+                class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 text-primary shadow-sm transition-all text-center">
+                En Espera
+            </button>
+            <button id="sidebar-tab-active"
+                class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all text-center">
+                Activos
+            </button>
+        </div>
+    </div>
+
+    <!-- List Container -->
+    <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-3 custom-scrollbar">
+        <!-- Waiting List -->
+        <div id="sidebar-waiting-list" class="space-y-3 min-h-[100px]">
+            <!-- Items -->
+        </div>
+        <!-- Active List -->
+        <div id="sidebar-active-list" class="hidden space-y-3 min-h-[100px]">
+            <!-- Items -->
+        </div>
+    </div>
+
+    <!-- Quick Actions Footer -->
+    <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
+        <button onclick="window.app.patientManager.openPatientModal()"
+            class="w-full py-2.5 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-slate-600 dark:text-gray-200 font-bold text-sm shadow-sm hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">person_add</span>
+            Nuevo Paciente
+        </button>
+    </div>
+</aside>

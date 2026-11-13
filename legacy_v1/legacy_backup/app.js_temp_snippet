@@ -1,0 +1,87 @@
+            // ... end of class ...
+        } // end constructor
+
+        // New Method: Render Patient View
+        renderPatientView(filterText = '') {
+            const container = document.getElementById('patient-list-container');
+            if (!container) return;
+
+            const patients = window.clinicStore.state.patients.filter(p => 
+                p.name.toLowerCase().includes(filterText.toLowerCase()) || 
+                p.phone.includes(filterText)
+            );
+
+            if (patients.length === 0) {
+                container.innerHTML = `
+                    <div class="p-12 text-center text-slate-500">
+                        <span class="material-symbols-outlined text-4xl mb-2 opacity-50">search_off</span>
+                        <p>No se encontraron pacientes.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 dark:bg-gray-700/50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700">
+                            <th class="p-4 pl-6">Paciente</th>
+                            <th class="p-4">Contacto</th>
+                            <th class="p-4">Estado</th>
+                            <th class="p-4">Disponibilidad / Notas</th>
+                            <th class="p-4 text-right pr-6">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            `;
+
+            patients.forEach(p => {
+                const statusColors = {
+                    'active': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                    'waiting': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                    'archived': 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                };
+                const statusLabels = {
+                    'active': 'Activo', 'waiting': 'En Espera', 'archived': 'Archivado'
+                };
+
+                html += `
+                    <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="p-4 pl-6">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                                    ${p.name.split(' ').map(n=>n[0]).slice(0,2).join('')}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-900 dark:text-white">${p.name}</p>
+                                    <p class="text-xs text-slate-400">${p.age} años · ${p.tutor || 'Sin tutor'}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-sm text-slate-600 dark:text-gray-300">
+                                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px] opacity-70">call</span> ${p.phone}</div>
+                                <div class="flex items-center gap-1.5 mt-0.5"><span class="material-symbols-outlined text-[14px] opacity-70">mail</span> ${p.email}</div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[p.status] || statusColors['active']}">
+                                ${statusLabels[p.status] || 'Activo'}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <p class="text-xs text-slate-600 dark:text-gray-400 max-w-xs truncate" title="${p.availability || ''}">
+                                ${p.availability ? `<span class="font-semibold text-slate-700 dark:text-gray-300">Disp:</span> ${p.availability}` : '—'}
+                            </p>
+                            ${p.notes ? `<p class="text-[10px] text-amber-600 mt-1 truncate max-w-xs"><span class="material-symbols-outlined text-[10px] align-middle">sticky_note_2</span> ${p.notes}</p>` : ''}
+                        </td>
+                        <td class="p-4 text-right pr-6">
+                            <button class="text-slate-400 hover:text-primary transition-colors p-1" title="Editar"><span class="material-symbols-outlined">edit</span></button>
+                            <button class="text-slate-400 hover:text-primary transition-colors p-1" title="Ver Historial"><span class="material-symbols-outlined">history</span></button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }

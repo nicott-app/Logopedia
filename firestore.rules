@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función auxiliar para verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Función para obtener los datos del usuario actual
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Reglas para la colección global de usuarios
+    match /users/{userId} {
+      // Un usuario solo puede leer su propio perfil al inicio, o perfiles de su misma clínica
+      allow read: if isAuthenticated() && (request.auth.uid == userId || getUserData().clinicId == resource.data.clinicId);
+      // Solo puede actualizar su propio perfil (o un admin de la clínica)
+      allow write: if isAuthenticated() && (request.auth.uid == userId || getUserData().role == 'admin');
+    }
+
+    // Aislamiento Multi-Tenant por Clínica
+    match /clinics/{clinicId} {
+      
+      // Función auxiliar para asegurar que el usuario pertenece a esta clínica
+      function belongsToClinic() {
+        return isAuthenticated() && getUserData().clinicId == clinicId;
+      }
+      
+      function isAdmin() {
+        return belongsToClinic() && getUserData().role == 'admin';
+      }
+
+      // Datos base de la clínica
+      allow read: if belongsToClinic();
+      allow write: if isAdmin();
+
+      // Subcolección: Patients y documentos clínicos/consentimientos
+      match /patients/{patientId} {
+        allow read: if belongsToClinic();
+        allow create, update: if belongsToClinic(); 
+        allow delete: if isAdmin();
+
+        match /{allChildren=**} {
+          allow read, write: if belongsToClinic();
+        }
+      }
+
+      // Subcolección: Rooms
+      match /rooms/{roomId} {
+        allow read: if belongsToClinic();
+        allow write: if isAdmin();
+      }
+
+      // Subcolección: Services
+      match /services/{serviceId} {
+        allow read: if belongsToClinic();
+        allow write: if isAdmin();
+      }
+
+      // Subcolección: Specialties
+      match /specialties/{specialtyId} {
+        allow read: if belongsToClinic();
+        allow write: if isAdmin();
+      }
+
+      // Subcolección: Appointments
+      match /appointments/{appointmentId} {
+        allow read: if belongsToClinic();
+        allow create, update: if belongsToClinic();
+        allow delete: if isAdmin() || (belongsToClinic() && resource.data.professionalId == request.auth.uid);
+      }
+    }
+  }
+}

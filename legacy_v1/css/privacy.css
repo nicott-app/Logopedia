@@ -1,0 +1,92 @@
+/* Privacy Mode Styles */
+body.privacy-restricted .sensitive {
+    filter: blur(5px);
+    pointer-events: none;
+    /* Prevent interaction while blurred */
+    user-select: none;
+    transition: filter 0.3s ease;
+}
+
+body.privacy-restricted .sensitive:hover {
+    /* Optional: Reveal on intentional hover but maybe not for strict mode */
+    /* filter: blur(2px); */
+}
+
+/* Specific targeted elements if adding .sensitive class manually is hard */
+/* We will try to add .sensitive class to names, but here is a fallback selectors approach */
+
+/* Broader Selectors for Privacy */
+
+/* 1. All Appointment Titles in Calendar */
+body.privacy-restricted .fc-event-title,
+body.privacy-restricted .appt-title,
+body.privacy-restricted div[class*="appt-card-title"] {
+    filter: blur(5px) !important;
+}
+
+/* 2. Names in Lists (Patients, Professionals) */
+body.privacy-restricted td p.font-bold,
+/* Patient Name in Table */
+body.privacy-restricted td .text-sm.font-bold,
+/* Prof Name in Table */
+body.privacy-restricted .list-group-item h5,
+/* Generic Lists */
+body.privacy-restricted .patient-name {
+    filter: blur(5px) !important;
+}
+
+/* 3. Modal Headers & Inputs */
+body.privacy-restricted #profile-name,
+body.privacy-restricted #patient-modal-title,
+body.privacy-restricted input[type="text"],
+body.privacy-restricted input[type="email"],
+body.privacy-restricted input[type="tel"],
+body.privacy-restricted textarea {
+    filter: blur(4px);
+    transition: filter 0.2s;
+}
+
+/* Exception for search inputs might be desired, but strict mode blurs all inputs */
+body.privacy-restricted input:focus,
+body.privacy-restricted textarea:focus {
+    /* Optional: Unblur on focus if needed, but strict mode usually forbids it */
+    /* filter: none; */
+}
+
+/* 4. Sidebar Profile Name */
+body.privacy-restricted .sidebar-profile-name {
+    filter: blur(3px);
+}
+
+/* 5. FULL PATIENT DATA PROTECTION */
+
+/* Blur ALL data cells in the patient list table */
+/* We target the container directly to ensure we catch the cells */
+body.privacy-restricted #patient-list-container table tbody tr td {
+    filter: blur(5px);
+    opacity: 0.7;
+    pointer-events: none;
+    /* Prevent clicking while blurred */
+}
+
+/* Optional: Leave the last column (Actions) visible if it doesn't contain data? 
+   User said "todo el contenido", so we blur everything to be safe. 
+   If they want buttons visible, we'd use td:not(:last-child). 
+   For now, strictly blur EVERYTHING. */
+
+/* Blur the Patient Profile Modal Sidebar (Contact info) */
+body.privacy-restricted #patient-profile-modal .w-full.md\:w-80 {
+    filter: blur(6px);
+}
+
+/* Blur the Main Content of Profile Modal (History, notes) */
+body.privacy-restricted #patient-profile-modal .flex-1.bg-white {
+    filter: blur(4px);
+}
+
+/* Blur Appointment Tooltips or Popovers if present */
+body.privacy-restricted .tippy-box,
+body.privacy-restricted .popover {
+    display: none !important;
+    /* Better to hide completely than blur floats */
+}
